@@ -1,3 +1,6 @@
+#Name: Molly Herckis
+#UMID: 53950022
+
 from bs4 import BeautifulSoup
 import requests
 import re
@@ -14,9 +17,23 @@ def get_titles_from_search_results(filename):
 
     [('Book title 1', 'Author 1'), ('Book title 2', 'Author 2')...]
     """
+    url = filename
+    resp = requests.get(url)
+    soup = BeautifulSoup(resp.content, 'html.parser')
+    authors = soup.find_all('a', class_= "authorName")
+    titles = soup.find_all('a', class_ = "bookTitle")
 
-    pass
+    newAuthors = []
+    newTitles = []
 
+    for element in titles: 
+        newTitles.append(element.strip())
+    for element in authors:
+        newAuthors.append(element.strip())
+
+    lst = list(zip(newTitles, newAuthors))
+
+    return lst
 
 def get_search_links():
     """
@@ -32,7 +49,19 @@ def get_search_links():
 
     """
 
-    pass
+    web_url = 'https://www.goodreads.com/search?q=fantasy&qid=NwUsLiA2Nc'
+    r = requests.get(web_url)
+    soup = BeautifulSoup(r.content, 'html.parser')
+
+    url_list = []
+    table = soup.find('table', class_= 'tableList')
+    x = table.find_all('tr')
+    for row in x[:10]:
+        info = row.find_all('td')
+        url = info[0].find('a')
+        link = "https://www.goodreads.com" + str(url['href'])
+        url_list.append(link)
+    return url_list
 
 
 def get_book_summary(book_url):
@@ -49,8 +78,18 @@ def get_book_summary(book_url):
     Make sure to strip() any newlines from the book title and number of pages.
     """
 
-    pass
+    request = requests.get(book_url)
+    soup = BeautifulSoup(r.content, 'html.parser')
 
+    booktitle = soup.find("h1", class_= "gr-h1 gr-h1--serif")
+    title = booktitle.text.strip()
+
+    author1 = soup.find('a', class_ = 'authorName')
+    author = author1.text.strip()
+
+    pages1 = soup.find('span', itemprop = 'numberOfPages')
+    pages = pages1.text.strip()
+    numpages = int(pages.split()[0])
 
 def summarize_best_books(filepath):
     """
@@ -105,7 +144,7 @@ class TestCases(unittest.TestCase):
 
     def test_get_titles_from_search_results(self):
         # call get_titles_from_search_results() on search_results.htm and save to a local variable
-
+        test = get_titles_from_search_results(search_results.htm)
         # check that the number of titles extracted is correct (20 titles)
 
         # check that the variable you saved after calling the function is a list
