@@ -180,28 +180,23 @@ class TestCases(unittest.TestCase):
 
         # check that the number of titles extracted is correct (20 titles)
         self.assertEqual(len(localvar), 20)
-
+        # check that the variable you saved after calling the function is a list
         self.assertIsInstance(localvar, list)
         
         for i in localvar:
             variable = i
+            # check that each item in the list is a tuple
             self.assertIsInstance(variable, tuple)
 
+        # check that the first book and author tuple is correct (open search_results.htm and find it)
         testTuple = localvar[0]
         self.assertEqual(testTuple, ("Harry Potter and the Deathly Hallows (Harry Potter, #7)", 'J.K. Rowling'))
 
-        lengthofList = len(localvar)
-        testTuple1 = localvar[lengthofList - 1]
+        # check that the last title is correct (open search_results.htm and find it)
+        lengthOfList = len(localvar)
+        testTuple1 = localvar[lengthOfList - 1]
         self.assertEqual(testTuple1[0], 'Harry Potter: The Prequel (Harry Potter, #0.5)')
 
-
-        # check that the variable you saved after calling the function is a list
-
-        # check that each item in the list is a tuple
-
-        # check that the first book and author tuple is correct (open search_results.htm and find it)
-
-        # check that the last title is correct (open search_results.htm and find it)
 
     def test_get_search_links(self):
         # check that TestCases.search_urls is a list
