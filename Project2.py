@@ -19,18 +19,17 @@ def get_titles_from_search_results(filename):
     """
     f = open(filename, "r")
     soup = BeautifulSoup(f, 'html.parser')
-    authors = soup.find_all('a', class_= "authorName")
     titles = soup.find_all('a', class_ = "bookTitle")
-
-    newAuthors = []
+    authors = soup.find_all('tr')
     newTitles = []
-
     for title in titles: 
         striptitle = title.text.strip()
         newTitles.append(striptitle)
     
+    newAuthors = []
     for author in authors:
-        stripAuthor = author.text.strip()
+        authors1 = author.find('a', class_= "authorName")
+        stripAuthor = authors1.text.strip()
         newAuthors.append(stripAuthor)
 
     lst = list(zip(newTitles, newAuthors))
@@ -85,8 +84,8 @@ def get_book_summary(book_url):
     resp = requests.get(book_url)
     soup = BeautifulSoup(resp.text, 'html.parser')
 
-    name = soup.find("h1", class_= "gr-h1--serif")
-    title = name.text.strip()
+    titles = soup.find("h1", class_= "gr-h1--serif")
+    title = titles.text.strip()
 
     author1 = soup.find('span', itemprop = 'name')
     author = author1.text.strip()
@@ -124,12 +123,13 @@ def summarize_best_books(filepath):
     links = soup.find_all('div', class_= 'category clearFix')
     urls = []
     for i in links:
-        new = i.find('a').get('href')
-        urls.append(new)
+        new_links = i.find('a').get('href')
+        urls.append(new_links)
 
     lst = list(zip(categories, titles, urls))
     
     f.close()
+
     return lst
 
 
@@ -244,22 +244,23 @@ class TestCases(unittest.TestCase):
             # check that each tuple has a length of 3
             self.assertEqual(len(i), 3)
         
+        # check that the first tuple is made up of the following 3 strings:'Fiction', "The Midnight Library", 'https://www.goodreads.com/choiceawards/best-fiction-books-2020'
         testTuple2 = variable[0]
         self.assertEqual(testTuple2, ("Fiction", "The Midnight Library", 'https://www.goodreads.com/choiceawards/best-fiction-books-2020'))
 
-        # check that the first tuple is made up of the following 3 strings:'Fiction', "The Midnight Library", 'https://www.goodreads.com/choiceawards/best-fiction-books-2020'
+        # check that the last tuple is made up of the following 3 strings: 'Picture Books', 'Antiracist Baby', 'https://www.goodreads.com/choiceawards/best-picture-books-2020'
         testTuple3 = variable[-1]
         self.assertEqual(testTuple3, ("Picture Books", "Antiracist Baby", 'https://www.goodreads.com/choiceawards/best-picture-books-2020'))
-        # check that the last tuple is made up of the following 3 strings: 'Picture Books', 'Antiracist Baby', 'https://www.goodreads.com/choiceawards/best-picture-books-2020'
+    
         
 
 
 
     def test_write_csv(self):
         # call get_titles_from_search_results on search_results.htm and save the result to a variable
-        localvar1 = get_titles_from_search_results('search_results.htm')
+        variable1 = get_titles_from_search_results('search_results.htm')
         # call write csv on the variable you saved and 'test.csv'
-        write_csv(localvar1, 'test.csv')
+        write_csv(variable1, 'test.csv')
         # read in the csv that you wrote (create a variable csv_lines - a list containing all the lines in the csv you just wrote to above)
         with open('test.csv', newline = '') as f:
             file_reader = csv.reader(f)
